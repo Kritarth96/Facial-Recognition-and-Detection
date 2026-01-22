@@ -1,0 +1,36 @@
+{
+  "name": "face-recognition-frontend",
+  "version": "1.0.0",
+  "description": "Modern frontend for face recognition system with collapsible image database",
+  "main": "static/js/dashboard_clean.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "dev": "tsc --watch",
+    "clean": "rimraf static/js/compiled",
+    "lint": "eslint src/typescript/**/*.ts",
+    "format": "prettier --write src/typescript/**/*.ts"
+  },
+  "keywords": [
+    "face-recognition",
+    "frontend",
+    "typescript",
+    "javascript",
+    "image-database"
+  ],
+  "author": "Kritarth",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "eslint": "^8.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "prettier": "^3.0.0",
+    "rimraf": "^5.0.0"
+  },
+  "dependencies": {},
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

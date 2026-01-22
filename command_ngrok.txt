@@ -1,0 +1,16 @@
+ngrok config add-authtoken 2tAD9pfiQH2VJxbA2YmyVLMD83g_4CHCNvmFK6jFoRBvYyAZs
+Run the server in vs code
+ngrok http 8080
+
+http://localhost:8080
+
+Unknown Face Registration    DONE
+If an unknown face is detected, prompt the user to register it with a name and add it to the dataset.
+This will improve recognition over time dynamically.
+Age & Gender Detection
+Integrate an Age & Gender Classification Model to estimate a person’s age and gender.
+Display it next to the detected face in real-time.
+Snap & Save Detected Faces 📸
+Add a button to capture images when a face is detected and save it for records.
+Add ROI selection
+Allow user to select region of interest.
