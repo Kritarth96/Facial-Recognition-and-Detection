@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Recognition Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/dashboard.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1>Face Recognition System</h1>
+        </div>
+        <div class="header-right">
+            <button class="dark-mode-toggle" id="darkModeToggle" title="Toggle Dark Mode">
+                <i class="fas fa-moon" id="darkModeIcon"></i>
+            </button>
+            <div class="user-profile">
+                <span class="user-name">{{ session.loginid if session.loginid else 'User' }}</span>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h2>
+                <i class="fas fa-database"></i>
+                Image Database
+            </h2>
+            <div class="sidebar-controls">
+                <button class="expand-all-btn" id="expandAllBtn">
+                    <i class="fas fa-expand-arrows-alt"></i>
+                    Expand All
+                </button>
+                <button class="spotted-today-btn" id="spottedTodayBtn" title="Show faces spotted today">
+                    <i class="fas fa-calendar-day"></i>
+                    <span class="spotted-count" id="spottedCount">0</span>
+                </button>
+                <button class="search-toggle" id="searchToggle">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+        
+        <div class="search-container" id="searchContainer">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search faces...">
+            <i class="fas fa-search search-icon"></i>
+        </div>
+
+        <div class="database-stats">
+            <div class="stat-item">
+                <span class="stat-number" id="totalFaces">0</span>
+                <span class="stat-label">Total Faces</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="recognizedToday">0</span>
+                <span class="stat-label">Recognized Today</span>
+            </div>
+        </div>
+
+        <div class="image-gallery" id="imageGallery">
+            <!-- Face groups will be dynamically populated here -->
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <div class="dashboard-grid">
+            <!-- Camera Feed Section -->
+            <section class="camera-section">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-video"></i>
+                        Live Camera Feed
+                    </h2>
+                    <div class="camera-controls">
+                        <button class="control-btn start-btn" id="startCameraBtn">
+                            <i class="fas fa-play"></i>
+                            Start Camera
+                        </button>
+                        <button class="control-btn stop-btn" id="stopCameraBtn" style="display: none;">
+                            <i class="fas fa-stop"></i>
+                            Stop Camera
+                        </button>
+                        <button class="control-btn fullscreen-btn" id="fullscreenBtn" style="display: none;">
+                            <i class="fas fa-expand"></i>
+                            Fullscreen
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="video-container" id="videoContainer">
+                    <img id="videoFeed" alt="Live Video Feed" style="display: none;">
+                    <div class="video-placeholder" id="videoPlaceholder">
+                        <i class="fas fa-camera"></i>
+                        <p>Click "Start Camera" to begin live feed</p>
+                    </div>
+                </div>
+
+                <div class="detection-toggles">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="recognizeFaces">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-label">Face Recognition</span>
+                    </label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="detectPeople">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-label">Person Detection</span>
+                    </label>
+                </div>
+            </section>
+
+            <!-- Upload Section -->
+            <section class="upload-section">
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        Add New Face
+                    </h2>
+                </div>
+                
+                <div class="upload-container">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-content">
+                            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                            <p>Drag & drop an image here or click to browse</p>
+                            <input type="file" id="faceFile" accept="image/*" hidden>
+                        </div>
+                        <div class="image-preview" id="imagePreview" style="display: none;">
+                            <img id="previewImg" alt="Preview">
+                            <button class="remove-image" id="removeImage">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="faceName">Person Name</label>
+                        <input type="text" id="faceName" placeholder="Enter person's name" required>
+                    </div>
+                    
+                    <button class="upload-btn" id="uploadBtn" disabled>
+                        <i class="fas fa-plus"></i>
+                        Add to Database
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Notification Container -->
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <!-- Modal for Face Details -->
+    <div class="modal" id="faceModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Face Details</h3>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Face details will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/dashboard_clean.js') }}"></script>
+</body>
+</html>
